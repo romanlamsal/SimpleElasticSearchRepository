@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.lamsal.esrepo.entity.SaveResponseTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2019-05-29T19:57:34" hostname="MASTABLASTA" time="0.525">
+  <properties/>
+  <testcase name="should deserialize SaveResponse from JSON()" classname="de.lamsal.esrepo.entity.SaveResponseTest" time="0.525"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
