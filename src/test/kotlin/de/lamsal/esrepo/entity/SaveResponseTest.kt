@@ -9,7 +9,7 @@ internal class SaveResponseTest {
 
     private companion object {
         const val jsonString = """{"_id":"some_id","result":"created"}"""
-        val saveResponse = SaveResponse("some_id", SAVERESULT.CREATED)
+        val saveResponse = SaveResponse("some_id")
     }
 
     private val mapper = DefaultObjectMapper()

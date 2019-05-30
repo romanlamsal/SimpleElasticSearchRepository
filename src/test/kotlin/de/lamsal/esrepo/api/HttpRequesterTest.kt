@@ -1,6 +1,9 @@
 package de.lamsal.esrepo.api
 
-import org.amshove.kluent.shouldEqual
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.model.HttpRequest
@@ -10,45 +13,86 @@ internal class HttpRequesterTestIT {
     private companion object {
         const val host = "localhost"
         const val port = 6464
+
+        private val server = ClientAndServer.startClientAndServer(port)
+
+        @AfterAll
+        @JvmStatic
+        fun teardown() = server.close()
     }
+
+    @BeforeEach
+    fun beforeEach() {
+        server.reset()
+    }
+
 
     @Test
     fun `can successfully POST via khttp`() {
-        ClientAndServer.startClientAndServer(port).use {
-            // given
-            val postBody = "foo"
-            val postResponse = "bar"
-            it.`when`(
-                HttpRequest.request().withMethod("POST").withBody(postBody)
-            ).respond(
-                HttpResponse.response().withBody(postResponse)
-            )
+        // given
+        val postBody = "foo"
+        val postResponse = "bar"
+        server.`when`(
+            HttpRequest.request().withMethod("POST").withBody(postBody)
+        ).respond(
+            HttpResponse.response().withBody(postResponse)
+        )
 
-            // when
-            val response = HttpRequester().post("http://$host:$port", postBody)
+        // when
+        val response = HttpRequester().post("http://$host:$port", postBody)
 
-            // then
-            response shouldEqual postResponse
-        }
+        // then
+        assertEquals(postResponse, response)
     }
 
     @Test
     fun `can successfully PUT via khttp`() {
-        ClientAndServer.startClientAndServer(port).use {
-            // given
-            val putBody = "foo"
-            val putResponse = "bar"
-            it.`when`(
-                HttpRequest.request().withMethod("PUT").withBody(putBody)
-            ).respond(
-                HttpResponse.response().withBody(putResponse)
-            )
+        // given
+        val putBody = "foo"
+        val putResponse = "bar"
+        server.`when`(
+            HttpRequest.request().withMethod("PUT").withBody(putBody)
+        ).respond(
+            HttpResponse.response().withBody(putResponse)
+        )
 
-            // when
-            val response = HttpRequester().put("http://$host:$port", putBody)
+        // when
+        val response = HttpRequester().put("http://$host:$port", putBody)
 
-            // then
-            response shouldEqual putResponse
-        }
+        // then
+        assertEquals(putResponse, response)
+    }
+
+    @Test
+    fun `can successfully GET via khttp`() {
+        // given
+        val getResponse = "foobar"
+        server.`when`(
+            HttpRequest.request().withMethod("GET")
+        ).respond(
+            HttpResponse.response().withBody(getResponse)
+        )
+
+        // when
+        val response = HttpRequester().get("http://$host:$port")
+
+        // then
+        assertEquals(getResponse, response)
+    }
+
+    @Test
+    fun `should return null, when erroneous status code is given`() {
+        // given
+        server.`when`(
+            HttpRequest.request().withMethod("GET")
+        ).respond(
+            HttpResponse.response().withStatusCode(404)
+        )
+
+        // when
+        val response = HttpRequester().get("http://$host:$port")
+
+        // then
+        assertNull(response)
     }
 }

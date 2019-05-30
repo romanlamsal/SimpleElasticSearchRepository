@@ -10,23 +10,24 @@ import de.lamsal.esrepo.entity.EntityWrapper
 import de.lamsal.esrepo.entity.SaveResponse
 
 class SimpleRepository<T> (
-    override val configuration: ElasticSearchConfiguration,
-    override val index: String,
-    override val mapper: ObjectMapper = DefaultObjectMapper(),
-    override val doctype: String = "_doc"
-) : IRepository<T> {
+    clazz: Class<T>,
+    configuration: ElasticSearchConfiguration,
+    index: String,
+    mapper: ObjectMapper = DefaultObjectMapper(),
+    doctype: String = "_doc"
+) : IRepository<T>(configuration, index, doctype, mapper) {
     private val api: IHttpRequester = HttpRequester()
 
-    private val hostUrl = configuration.run { "$protocol://$host:$port" }
+    private val classToMap = mapper.typeFactory.constructParametricType(EntityWrapper::class.java, clazz)
 
     override fun save(obj: T, id: String?): String = mapper.readValue<SaveResponse>(
         if (id.isNullOrEmpty()) {
-            api.post("$hostUrl/$index/$doctype", mapper.writeValueAsString(obj))
+            api.post("$hostUrl/$index/$doctype", mapper.writeValueAsString(obj))!!
         } else {
-            api.put("$hostUrl/$index/$doctype/$id", mapper.writeValueAsString(obj))
+            api.put("$hostUrl/$index/$doctype/$id", mapper.writeValueAsString(obj))!!
         })._id
 
-    override fun getById(_id: String): EntityWrapper<T> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getById(id: String): T? = api.get("$hostUrl/$index/$doctype/$id")?.let {
+        mapper.readValue<EntityWrapper<T>>(it, classToMap)._source
     }
 }

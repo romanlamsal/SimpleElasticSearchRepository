@@ -2,17 +2,27 @@ package de.lamsal.esrepo.repository
 
 import de.lamsal.esrepo.api.HttpRequester
 import de.lamsal.esrepo.configuration.ElasticSearchConfiguration
+import de.lamsal.esrepo.entity.EntityWrapper
 import de.lamsal.esrepo.util.DefaultObjectMapper
 import io.mockk.*
 import io.mockk.impl.annotations.OverrideMockKs
 import org.amshove.kluent.shouldEqual
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class SimpleRepositoryTest {
     private companion object {
+        val configuration = ElasticSearchConfiguration(host = "localhost", port = 9200)
+        val hostUrl = configuration.run { "$protocol://$host:$port" }
+
+        val mapper = DefaultObjectMapper() // default value in SimpleRepository
+
+        val entity = Entity("foo")
+
         const val index = "testindex"
-        const val doctype = "thedoctype"
+        const val doctype = "_doc" // default value in SimpleRepository
         const val expectedId = "some_id"
         const val saveResponseJson = """{
             "_shards" : {
@@ -29,12 +39,14 @@ internal class SimpleRepositoryTest {
             "result" : "created"
         }"""
 
-
-        val mapper = DefaultObjectMapper()
-
-        val configuration = ElasticSearchConfiguration(host = "localhost", port = 9200)
-
-        val entity = Entity("foo")
+        val getResponseJson = """{
+    "_index" : "twitter",
+    "_type" : "_doc",
+    "_id" : "$expectedId",
+    "_version" : 1,
+    "found": true,
+    "_source" : ${mapper.writeValueAsString(entity)}
+}"""
     }
 
     @OverrideMockKs
@@ -46,10 +58,9 @@ internal class SimpleRepositoryTest {
     fun beforeEach() {
         apiMock = mockk()
         repository = SimpleRepository(
+            clazz = Entity::class.java,
             configuration = configuration,
-            mapper = mapper,
-            index = index,
-            doctype = doctype
+            index = index
         )
 
         MockKAnnotations.init(this)
@@ -60,7 +71,7 @@ internal class SimpleRepositoryTest {
         // given
         every {
             apiMock.post(
-                configuration.run { "$protocol://$host:$port" } + "/$index/$doctype", any()
+                "$hostUrl/$index/$doctype", any()
             )
         } returns saveResponseJson
 
@@ -69,7 +80,6 @@ internal class SimpleRepositoryTest {
 
         // then
         saveresponse shouldEqual expectedId
-
         verify { apiMock.post(any(), mapper.writeValueAsString(entity)) }
     }
 
@@ -78,8 +88,8 @@ internal class SimpleRepositoryTest {
         // given
         every {
             apiMock.put(
-                configuration.run { "$protocol://$host:$port" } + "/$index/$doctype/$expectedId", any()
-                )
+                "$hostUrl/$index/$doctype/$expectedId", any()
+            )
         } returns saveResponseJson
 
         // when
@@ -87,8 +97,31 @@ internal class SimpleRepositoryTest {
 
         // then
         verify { apiMock.put(any(), mapper.writeValueAsString(entity)) }
-
         saveresponse shouldEqual expectedId
+    }
+
+    @Test
+    fun `should return null, when getById can not find anything`() {
+        // given
+        every { apiMock.get(any()) } returns null
+
+        // when
+        val response = repository.getById("foo")
+
+        // then
+        assertNull(response)
+    }
+
+    @Test
+    fun `should return entity, when getById is called successfully`() {
+        // given
+        every { apiMock.get("$hostUrl/$index/$doctype/$expectedId") } returns getResponseJson
+
+        // when
+        val response = repository.getById(expectedId)
+
+        // then
+        assertEquals(entity, response)
     }
 
     data class Entity(val value: String)
