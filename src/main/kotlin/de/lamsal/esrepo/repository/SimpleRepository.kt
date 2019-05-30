@@ -13,9 +13,9 @@ class SimpleRepository<T> (
     override val configuration: ElasticSearchConfiguration,
     override val index: String,
     override val mapper: ObjectMapper = DefaultObjectMapper(),
-    override val doctype: String = "_doc",
-    private val api: IHttpRequester = HttpRequester()
+    override val doctype: String = "_doc"
 ) : IRepository<T> {
+    private val api: IHttpRequester = HttpRequester()
 
     private val hostUrl = configuration.run { "$protocol://$host:$port" }
 

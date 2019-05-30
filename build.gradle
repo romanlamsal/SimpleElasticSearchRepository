@@ -17,7 +17,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9'
     implementation 'khttp:khttp:1.0.0'
 
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+    testImplementation "io.mockk:mockk:1.9.3"
     testImplementation 'org.mock-server:mockserver-netty:5.5.4'
     testImplementation 'org.amshove.kluent:kluent:1.4'
 
