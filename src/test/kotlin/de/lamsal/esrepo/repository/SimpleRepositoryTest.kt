@@ -1,8 +1,7 @@
 package de.lamsal.esrepo.repository
 
 import de.lamsal.esrepo.api.HttpRequester
-import de.lamsal.esrepo.configuration.ElasticSearchConfiguration
-import de.lamsal.esrepo.entity.EntityWrapper
+import de.lamsal.esrepo.ElasticSearchConfiguration
 import de.lamsal.esrepo.util.DefaultObjectMapper
 import io.mockk.*
 import io.mockk.impl.annotations.OverrideMockKs

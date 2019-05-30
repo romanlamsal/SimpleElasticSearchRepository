@@ -5,29 +5,31 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import de.lamsal.esrepo.api.HttpRequester
 import de.lamsal.esrepo.api.IHttpRequester
 import de.lamsal.esrepo.util.DefaultObjectMapper
-import de.lamsal.esrepo.configuration.ElasticSearchConfiguration
-import de.lamsal.esrepo.entity.EntityWrapper
-import de.lamsal.esrepo.entity.SaveResponse
+import de.lamsal.esrepo.ElasticSearchConfiguration
+import de.lamsal.esrepo.response.GetResponse
+import de.lamsal.esrepo.response.SaveResponse
 
 class SimpleRepository<T> (
     clazz: Class<T>,
     configuration: ElasticSearchConfiguration,
-    index: String,
-    mapper: ObjectMapper = DefaultObjectMapper(),
-    doctype: String = "_doc"
-) : IRepository<T>(configuration, index, doctype, mapper) {
+    private val index: String,
+    private val mapper: ObjectMapper = DefaultObjectMapper(),
+    private val doctype: String = "_doc"
+) {
+    private val hostUrl = configuration.run { "$protocol://$host:$port" }
+
     private val api: IHttpRequester = HttpRequester()
 
-    private val classToMap = mapper.typeFactory.constructParametricType(EntityWrapper::class.java, clazz)
+    private val classToMap = mapper.typeFactory.constructParametricType(GetResponse::class.java, clazz)
 
-    override fun save(obj: T, id: String?): String = mapper.readValue<SaveResponse>(
+    fun save(obj: T, id: String?): String = mapper.readValue<SaveResponse>(
         if (id.isNullOrEmpty()) {
             api.post("$hostUrl/$index/$doctype", mapper.writeValueAsString(obj))!!
         } else {
             api.put("$hostUrl/$index/$doctype/$id", mapper.writeValueAsString(obj))!!
         })._id
 
-    override fun getById(id: String): T? = api.get("$hostUrl/$index/$doctype/$id")?.let {
-        mapper.readValue<EntityWrapper<T>>(it, classToMap)._source
+    fun getById(id: String): T? = api.get("$hostUrl/$index/$doctype/$id")?.let {
+        mapper.readValue<GetResponse<T>>(it, classToMap)._source
     }
 }

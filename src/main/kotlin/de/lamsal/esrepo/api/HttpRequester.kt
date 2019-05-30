@@ -8,7 +8,7 @@ class HttpRequester : IHttpRequester {
 
     override fun get(url: String): String? = khttp.get(url).getText()
 
-    override fun post(url: String, data: Any): String? = khttp.post(url, data=data).getText()
+    override fun post(url: String, data: Any): String? = khttp.post(url, data=data, headers = mapOf("Content-Type" to "application/json")).getText()
 
-    override fun put(url: String, data: Any): String? = khttp.put(url, data=data).getText()
+    override fun put(url: String, data: Any): String? = khttp.put(url, data=data, headers = mapOf("Content-Type" to "application/json")).getText()
 }

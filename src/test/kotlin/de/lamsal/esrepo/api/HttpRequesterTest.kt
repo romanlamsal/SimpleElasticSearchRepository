@@ -33,7 +33,9 @@ internal class HttpRequesterTestIT {
         val postBody = "foo"
         val postResponse = "bar"
         server.`when`(
-            HttpRequest.request().withMethod("POST").withBody(postBody)
+            HttpRequest.request().withMethod("POST")
+                .withHeader("Content-Type", "application/json")
+                .withBody(postBody)
         ).respond(
             HttpResponse.response().withBody(postResponse)
         )
@@ -51,7 +53,9 @@ internal class HttpRequesterTestIT {
         val putBody = "foo"
         val putResponse = "bar"
         server.`when`(
-            HttpRequest.request().withMethod("PUT").withBody(putBody)
+            HttpRequest.request().withMethod("PUT")
+                .withHeader("Content-Type", "application/json")
+                .withBody(putBody)
         ).respond(
             HttpResponse.response().withBody(putResponse)
         )
