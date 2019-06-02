@@ -4,17 +4,17 @@ import org.amshove.kluent.shouldEqual
 import org.junit.jupiter.api.Test
 
 internal class BoolTest {
-    private val bool = Bool {
+    private val bool = bool {
         must {
-            + Term { "foo" to "bar" }
+            + term { "foo" to "bar" }
         }
 
         should {
-            + Term { "bar" to "baz" }
+            + term { "bar" to "baz" }
         }
 
         mustNot {
-            + Terms { "key" to listOf("foo", "bar", "baz") }
+            + terms { "key" to listOf("foo", "bar", "baz") }
         }
     }
 
@@ -31,9 +31,9 @@ internal class BoolTest {
 
     @Test
     fun `should be serializable with only one booltype`() {
-        Bool {
+        bool {
             must {
-                +Term { "foo" to "bar" }
+                + term { "foo" to "bar" }
             }
         }.toString() shouldEqual """{"bool":{"must":[{"term":{"foo":"bar"}}]}}"""
     }

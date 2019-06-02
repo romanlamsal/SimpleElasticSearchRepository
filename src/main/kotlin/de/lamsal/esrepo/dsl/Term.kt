@@ -1,6 +1,6 @@
 package de.lamsal.esrepo.dsl
 
-class Term (
+class Term internal constructor(
     initTerm: () -> Pair<String, Any>
 ) : QueryElement {
     private val term = initTerm().let { mapOf(it.first to it.second) }
@@ -9,3 +9,5 @@ class Term (
         """{"term":{"$key":"$value"}}"""
     }
 }
+
+val term = ::Term

@@ -4,8 +4,8 @@ import org.amshove.kluent.shouldEqual
 import org.junit.jupiter.api.Test
 
 internal class QueryTest {
-    private val query = Query {
-            Term {
+    private val query = query {
+            term {
                 "foo" to "bar"
             }
         }

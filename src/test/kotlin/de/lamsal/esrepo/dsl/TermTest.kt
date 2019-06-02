@@ -4,7 +4,7 @@ import org.amshove.kluent.shouldEqual
 import org.junit.jupiter.api.Test
 
 internal class TermTest {
-    private val term = Term { "foo" to "bar" }
+    private val term = term { "foo" to "bar" }
     private val termJson = """{"term":{"foo":"bar"}}"""
 
     @Test

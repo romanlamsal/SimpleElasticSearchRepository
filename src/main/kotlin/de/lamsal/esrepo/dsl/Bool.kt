@@ -1,28 +1,29 @@
 package de.lamsal.esrepo.dsl
 
-class Bool(
+class Bool internal constructor(
     init: Bool.() -> Unit
 ) : QueryElement {
-    private val mustElements: BuilderList = BuilderList("must")
-    private val shouldElements: BuilderList = BuilderList("should")
-    private val mustNotElements: BuilderList = BuilderList("must_not")
+
+    private val must: BuilderList = BuilderList("must")
+    private val should: BuilderList = BuilderList("should")
+    private val mustNot: BuilderList = BuilderList("must_not")
 
     init {
         init()
     }
 
-    fun must(initMust: BuilderList.() -> Unit) = mustElements.initMust()
-    fun should(initShould: BuilderList.() -> Unit) = shouldElements.initShould()
-    fun mustNot(initMustNot: BuilderList.() -> Unit) = mustNotElements.initMustNot()
+    fun must(initMust: BuilderList.() -> Unit) = must.initMust()
+    fun should(initShould: BuilderList.() -> Unit) = should.initShould()
+    fun mustNot(initMustNot: BuilderList.() -> Unit) = mustNot.initMustNot()
 
     override fun toString(): String =
         """{"bool":{${
-        listOf(mustElements.toString(), shouldElements.toString(), mustNotElements.toString())
+        listOf(must.toString(), should.toString(), mustNot.toString())
             .filter { it.isNotEmpty() }
             .joinToString(",")
         }}}"""
 
-    inner class BuilderList(val tag: String) {
+    inner class BuilderList(private val tag: String) {
         private val values: MutableList<QueryElement> = mutableListOf()
 
         operator fun QueryElement.unaryPlus() {
@@ -33,3 +34,5 @@ class Bool(
                 """"$tag":${values.joinToString(prefix = "[", separator = ",", postfix = "]")}"""
     }
 }
+
+val bool = ::Bool

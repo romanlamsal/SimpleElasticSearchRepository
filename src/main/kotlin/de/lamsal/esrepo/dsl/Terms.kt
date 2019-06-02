@@ -1,6 +1,6 @@
 package de.lamsal.esrepo.dsl
 
-class Terms (
+class Terms internal constructor(
     initTerm: () -> Pair<String, List<Any>>
 ) : QueryElement {
     private val terms = initTerm().let { mapOf(it.first to it.second) }
@@ -14,3 +14,5 @@ class Terms (
         }}}}"""
     }
 }
+
+val terms = ::Terms
