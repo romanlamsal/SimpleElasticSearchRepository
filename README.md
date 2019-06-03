@@ -1,0 +1,2 @@
+# SimpleElasticSearchRepository
+Basic implementation 
