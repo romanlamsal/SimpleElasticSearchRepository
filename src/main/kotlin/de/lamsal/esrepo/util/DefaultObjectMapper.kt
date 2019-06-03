@@ -8,7 +8,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 class DefaultObjectMapper : ObjectMapper() {
     init {
         registerModule(KotlinModule())
-        enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 }
