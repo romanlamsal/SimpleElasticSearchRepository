@@ -1,13 +1,14 @@
 package de.lamsal.esrepo.api
 
+import de.lamsal.esrepo.exception.HttpError
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
+import org.junit.jupiter.api.Assertions.assertThrows as assertThrows
 
 internal class HttpRequesterTestIT {
     private companion object {
@@ -85,7 +86,7 @@ internal class HttpRequesterTestIT {
     }
 
     @Test
-    fun `should return null, when erroneous status code is given`() {
+    fun `should throw error, when erroneous status code is given`() {
         // given
         server.`when`(
             HttpRequest.request().withMethod("GET")
@@ -93,10 +94,9 @@ internal class HttpRequesterTestIT {
             HttpResponse.response().withStatusCode(404)
         )
 
-        // when
-        val response = HttpRequester().get("http://$host:$port")
-
-        // then
-        assertNull(response)
+        // when, then
+        assertThrows(HttpError::class.java) {
+            HttpRequester().get("http://$host:$port")
+        }
     }
 }

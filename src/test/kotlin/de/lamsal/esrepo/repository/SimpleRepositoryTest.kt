@@ -2,6 +2,12 @@ package de.lamsal.esrepo.repository
 
 import de.lamsal.esrepo.api.HttpRequester
 import de.lamsal.esrepo.ElasticSearchConfiguration
+import de.lamsal.esrepo.api.PagedResult
+import de.lamsal.esrepo.api.QueryParams
+import de.lamsal.esrepo.dsl.query
+import de.lamsal.esrepo.dsl.terms
+import de.lamsal.esrepo.exception.HttpError
+import de.lamsal.esrepo.response.GetResponse
 import de.lamsal.esrepo.util.DefaultObjectMapper
 import io.mockk.*
 import io.mockk.impl.annotations.OverrideMockKs
@@ -39,13 +45,67 @@ internal class SimpleRepositoryTest {
         }"""
 
         val getResponseJson = """{
-    "_index" : "twitter",
-    "_type" : "_doc",
-    "_id" : "$expectedId",
-    "_version" : 1,
-    "found": true,
-    "_source" : ${mapper.writeValueAsString(entity)}
-}"""
+            "_index" : "twitter",
+            "_type" : "_doc",
+            "_id" : "0",
+            "_version" : 1,
+            "_seq_no" : 10,
+            "_primary_term" : 1,
+            "found": true,
+            "_source" : ${mapper.writeValueAsString(entity)}
+        }"""
+
+        const val scrollId = """superlongscrollid"""
+        const val searchResponseJson = """{
+          "_scroll_id": "$scrollId",
+          "took": 6,
+          "timed_out": false,
+          "_shards": {
+            "total": 5,
+            "successful": 5,
+            "skipped": 0,
+            "failed": 0
+          },
+          "hits": {
+            "total": 5,
+            "max_score": 2.730029,
+            "hits": [
+              {
+                "_index": "choices",
+                "_type": "choice",
+                "_id": "kjasld",
+                "_score": 2.730029,
+                "_source": {
+                  "value": "Foo"
+                }
+              },
+              {
+                "_index": "choices",
+                "_type": "choice",
+                "_id": "24n11l",
+                "_score": 2.4849067,
+                "_source": {
+                  "value": "Bar"
+                }
+              }
+            ]
+          }
+        }"""
+        const val searchResponseJsonPageTwo = """{
+          "took": 6,
+          "timed_out": false,
+          "_shards": {
+            "total": 5,
+            "successful": 5,
+            "skipped": 0,
+            "failed": 0
+          },
+          "hits": {
+            "total": 5,
+            "max_score": 2.730029,
+            "hits": []
+          }
+        }"""
     }
 
     @OverrideMockKs
@@ -102,7 +162,7 @@ internal class SimpleRepositoryTest {
     @Test
     fun `should return null, when getById can not find anything`() {
         // given
-        every { apiMock.get(any()) } returns null
+        every { apiMock.get(any()) } throws HttpError(Exception("Some HttpError."))
 
         // when
         val response = repository.getById("foo")
@@ -121,6 +181,33 @@ internal class SimpleRepositoryTest {
 
         // then
         assertEquals(entity, response)
+    }
+
+    @Test
+    fun `should be able to execute query with params`() {
+        // given
+        val query = query { terms { "value" to listOf("Foo", "Bar") } }.toString()
+        every { apiMock.post("$hostUrl/$index/$doctype/_search?scroll=5m&size=2", query) } returns searchResponseJson
+        every { apiMock.get("$hostUrl/_search/scroll?scroll_id=$scrollId") } returns searchResponseJsonPageTwo
+
+        // when
+        val pagedResult: PagedResult<Entity> = repository.executeQuery(query, QueryParams(size = 2, scroll = "5m"))
+
+        // then
+        val expectedHits = listOf(GetResponse(Entity("Foo")), GetResponse(Entity("Bar")))
+        assertEquals(expectedHits, pagedResult.flatten())
+    }
+
+    @Test
+    fun `force refresh`() {
+        // given
+        every { apiMock.post("$hostUrl/$index/_refresh") } returns "OK"
+
+        // when
+        repository.refresh()
+
+        // then
+        verify { apiMock.post("$hostUrl/$index/_refresh", null) }
     }
 
     data class Entity(val value: String)

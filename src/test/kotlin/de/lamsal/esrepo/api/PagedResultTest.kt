@@ -40,7 +40,7 @@ internal class PagedResultTest {
     }
 
     @Test
-    fun `should get hits of new page, when SearchResponse is reassigned`() {
+    fun `should get hits of all pages, when next page is requested, even when next page has empty list`() {
         // given
         val pagedResult = PagedResult(searchResponseWithScroll) {
             SearchResponse(null, SearchResponse.SearchResponseHits(10, emptyList()))
@@ -60,10 +60,11 @@ internal class PagedResultTest {
         // first page: one entry, second page: 8 entries, third page: one entry.
         val pages = listOf(
             searchResponseWithScroll,
-            SearchResponse(null, SearchResponse.SearchResponseHits(8, (0 until 8).map {
+            SearchResponse(null, SearchResponse.SearchResponseHits(10, (0 until 8).map {
                 GetResponse(entity)
             })),
-            searchResponseWithoutScroll
+            searchResponseWithoutScroll,
+            SearchResponse(null, SearchResponse.SearchResponseHits(10, emptyList()))
         )
         var currentPage = 0
 
@@ -76,7 +77,35 @@ internal class PagedResultTest {
 
         // then
         mappedPages shouldEqual listOf(pages[0].hits.hits, pages[1].hits.hits, pages[2].hits.hits)
+    }
 
+    @Test
+    fun `should iterate TWICE over all pages, will both times return the same result`() {
+        // given
+        // total of 10 hits
+        // first page: one entry, second page: 8 entries, third page: one entry.
+        val pages = listOf(
+            searchResponseWithScroll,
+            SearchResponse(null, SearchResponse.SearchResponseHits(10, (1..8).map {
+                GetResponse(Entity("$it"))
+            })),
+            searchResponseWithoutScroll,
+            SearchResponse(null, SearchResponse.SearchResponseHits(10, emptyList()))
+        )
+        var currentPage = 0
+
+        val pagedResult = PagedResult(searchResponseWithScroll) {
+            pages[++currentPage]
+        }
+
+        // when
+        val mappedPages = pagedResult.map { it }
+        currentPage = 0
+
+        // then
+        mappedPages shouldEqual pagedResult.map { it }
+        mappedPages.flatten() shouldEqual pagedResult.hits
+        mappedPages.flatten().size shouldEqual 10
     }
 
     data class Entity(val value: String)

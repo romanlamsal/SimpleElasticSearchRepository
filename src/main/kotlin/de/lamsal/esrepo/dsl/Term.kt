@@ -6,7 +6,11 @@ class Term internal constructor(
     private val term = initTerm().let { mapOf(it.first to it.second) }
 
     override fun toString(): String = term.entries.first().run {
-        """{"term":{"$key":"$value"}}"""
+        """{"term":{"$key":${
+        when (value) {
+            is String -> "\"$value\""
+            else -> value
+        }}}}"""
     }
 }
 

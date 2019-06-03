@@ -11,4 +11,9 @@ internal class TermTest {
     fun `should be serializable with toString`() {
         term.toString() shouldEqual termJson
     }
+
+    @Test
+    fun `should be serializable with toString and a number as value`() {
+        term { "foo" to 1337 }.toString() shouldEqual """{"term":{"foo":1337}}"""
+    }
 }
