@@ -6,7 +6,7 @@ import java.lang.Exception
 
 class HttpRequester : IHttpRequester {
 
-    private fun Response.isOkay(): Boolean = statusCode in (200 until 300)
+    private fun Response.isOkay(): Boolean = statusCode in 200..299
 
     private fun Response.getText(): String = this.text.takeIf { this.isOkay() } ?: throw HttpError(Exception("Status code $statusCode: $text"))
 

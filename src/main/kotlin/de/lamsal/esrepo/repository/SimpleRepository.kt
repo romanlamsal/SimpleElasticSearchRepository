@@ -26,8 +26,8 @@ class SimpleRepository<T>(
 
     private val classToGetResponse = mapper.typeFactory.constructParametricType(GetResponse::class.java, clazz)
 
-    fun save(obj: T, id: String?): String = mapper.readValue<SaveResponse>(
-        if (id.isNullOrEmpty()) {
+    fun save(obj: T, id: String = ""): String = mapper.readValue<SaveResponse>(
+        if (id.isEmpty()) {
             api.post("$hostUrl/$index/$doctype", mapper.writeValueAsString(obj))
         } else {
             api.put("$hostUrl/$index/$doctype/$id", mapper.writeValueAsString(obj))

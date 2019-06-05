@@ -38,7 +38,9 @@ internal class HttpRequesterTestIT {
                 .withHeader("Content-Type", "application/json")
                 .withBody(postBody)
         ).respond(
-            HttpResponse.response().withBody(postResponse)
+            HttpResponse.response()
+                .withStatusCode(200)
+                .withBody(postResponse)
         )
 
         // when
@@ -58,7 +60,9 @@ internal class HttpRequesterTestIT {
                 .withHeader("Content-Type", "application/json")
                 .withBody(putBody)
         ).respond(
-            HttpResponse.response().withBody(putResponse)
+            HttpResponse.response()
+                .withStatusCode(200)
+                .withBody(putResponse)
         )
 
         // when
@@ -75,7 +79,9 @@ internal class HttpRequesterTestIT {
         server.`when`(
             HttpRequest.request().withMethod("GET")
         ).respond(
-            HttpResponse.response().withBody(getResponse)
+            HttpResponse.response()
+                .withStatusCode(200)
+                .withBody(getResponse)
         )
 
         // when
@@ -91,7 +97,8 @@ internal class HttpRequesterTestIT {
         server.`when`(
             HttpRequest.request().withMethod("GET")
         ).respond(
-            HttpResponse.response().withStatusCode(404)
+            HttpResponse.response()
+                .withStatusCode(404)
         )
 
         // when, then

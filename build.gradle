@@ -6,6 +6,7 @@ group 'de.lamsal'
 version '0.1'
 
 apply plugin: 'kotlin'
+apply plugin: 'jacoco'
 
 repositories {
     jcenter()
@@ -38,4 +39,15 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+jacoco {
+    toolVersion = "0.8.4"
+    reportsDir = file("$buildDir/reports")
+}
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
 }

@@ -2,6 +2,7 @@ package de.lamsal.esrepo.repository
 
 import de.lamsal.esrepo.api.HttpRequester
 import de.lamsal.esrepo.ElasticSearchConfiguration
+import de.lamsal.esrepo.api.IHttpRequester
 import de.lamsal.esrepo.api.PagedResult
 import de.lamsal.esrepo.api.QueryParams
 import de.lamsal.esrepo.dsl.query
@@ -111,7 +112,7 @@ internal class SimpleRepositoryTest {
     @OverrideMockKs
     private lateinit var repository: SimpleRepository<Entity>
 
-    private lateinit var apiMock: HttpRequester
+    private lateinit var apiMock: IHttpRequester
 
     @BeforeEach
     fun beforeEach() {
@@ -135,7 +136,7 @@ internal class SimpleRepositoryTest {
         } returns saveResponseJson
 
         // when
-        val saveresponse = repository.save(entity, null)
+        val saveresponse = repository.save(entity)
 
         // then
         saveresponse shouldEqual expectedId
