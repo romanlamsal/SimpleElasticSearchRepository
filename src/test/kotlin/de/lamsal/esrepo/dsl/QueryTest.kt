@@ -1,6 +1,6 @@
 package de.lamsal.esrepo.dsl
 
-import org.amshove.kluent.shouldEqual
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.Test
 
 internal class QueryTest {
@@ -14,6 +14,6 @@ internal class QueryTest {
 
     @Test
     fun `should be serializable by toString with term`() {
-        query.toString() shouldEqual jsonString
+        query.toString() shouldBe jsonString
     }
 }

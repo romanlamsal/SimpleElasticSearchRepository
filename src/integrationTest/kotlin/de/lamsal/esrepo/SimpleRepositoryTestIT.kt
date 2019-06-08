@@ -4,10 +4,9 @@ import de.lamsal.esrepo.dsl.query
 import de.lamsal.esrepo.dsl.term
 import de.lamsal.esrepo.repository.SimpleRepository
 import de.lamsal.esrepo.response.GetResponse
-import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldEqual
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import io.kotlintest.matchers.collections.shouldContainAll
+import io.kotlintest.matchers.string.shouldNotHaveLength
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -30,10 +29,10 @@ class SimpleRepositoryTestIT : BaseIntegrationTest() {
     @Order(1)
     fun `should save entity`() {
         // when
-        receivedId = repository.save(savableEntity, null)
+        receivedId = repository.save(savableEntity)
 
         // then
-        assertNotNull(receivedId)
+        receivedId shouldNotHaveLength 0
     }
 
     @Test
@@ -43,7 +42,7 @@ class SimpleRepositoryTestIT : BaseIntegrationTest() {
         val receivedEntity = repository.getById(receivedId)
 
         // then
-        assertEquals(savableEntity, receivedEntity)
+        receivedEntity shouldBe savableEntity
     }
 
     @Test
@@ -57,7 +56,7 @@ class SimpleRepositoryTestIT : BaseIntegrationTest() {
 
         // then
         val receivedEntity = repository.getById(receivedId)
-        assertEquals(savableEntityChanged, receivedEntity)
+        receivedEntity shouldBe savableEntityChanged
     }
 
     @Test
@@ -65,7 +64,7 @@ class SimpleRepositoryTestIT : BaseIntegrationTest() {
     fun `should be searchable with query and successfully paginate`() {
         // given
         // updated entity and savableEntity
-        repository.save(savableEntity, null)
+        repository.save(savableEntity)
         val query = query {
             bool {
                 should {
@@ -85,7 +84,7 @@ class SimpleRepositoryTestIT : BaseIntegrationTest() {
         val searchResponse = repository.executeQuery(query.toString(), QueryParams(size = 1, scroll = "1m"))
 
         // then
-        searchResponse.flatten().sortedBy { it._source.number } shouldEqual listOf(
+        searchResponse.flatten() shouldContainAll listOf(
             GetResponse(savableEntityChanged),
             GetResponse(savableEntity)
         )

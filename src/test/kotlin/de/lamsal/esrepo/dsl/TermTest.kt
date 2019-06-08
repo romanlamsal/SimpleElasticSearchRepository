@@ -1,6 +1,6 @@
 package de.lamsal.esrepo.dsl
 
-import org.amshove.kluent.shouldEqual
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.Test
 
 internal class TermTest {
@@ -9,11 +9,11 @@ internal class TermTest {
 
     @Test
     fun `should be serializable with toString`() {
-        term.toString() shouldEqual termJson
+        term.toString() shouldBe termJson
     }
 
     @Test
     fun `should be serializable with toString and a number as value`() {
-        term { "foo" to 1337 }.toString() shouldEqual """{"term":{"foo":1337}}"""
+        term { "foo" to 1337 }.toString() shouldBe """{"term":{"foo":1337}}"""
     }
 }

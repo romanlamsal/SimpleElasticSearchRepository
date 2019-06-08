@@ -1,6 +1,6 @@
 package de.lamsal.esrepo.dsl
 
-import org.amshove.kluent.shouldEqual
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.Test
 
 internal class BoolTest {
@@ -20,7 +20,7 @@ internal class BoolTest {
 
     @Test
     fun `should be serializable by toString`() {
-        bool.toString() shouldEqual """{
+        bool.toString() shouldBe """{
             "bool": {
                 "must": [ { "term": { "foo": "bar" } } ],
                 "should": [ { "term": { "bar": "baz" } } ],
@@ -35,6 +35,6 @@ internal class BoolTest {
             must {
                 + term { "foo" to "bar" }
             }
-        }.toString() shouldEqual """{"bool":{"must":[{"term":{"foo":"bar"}}]}}"""
+        }.toString() shouldBe """{"bool":{"must":[{"term":{"foo":"bar"}}]}}"""
     }
 }

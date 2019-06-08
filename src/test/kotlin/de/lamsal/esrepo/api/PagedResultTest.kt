@@ -2,7 +2,8 @@ package de.lamsal.esrepo.api
 
 import de.lamsal.esrepo.response.GetResponse
 import de.lamsal.esrepo.response.SearchResponse
-import org.amshove.kluent.shouldEqual
+import io.kotlintest.matchers.collections.shouldContainAll
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.Test
 
 internal class PagedResultTest {
@@ -36,7 +37,7 @@ internal class PagedResultTest {
         val hits = pagedResult.hits
 
         // then
-        hits shouldEqual listOf(GetResponse(entity))
+        hits shouldContainAll listOf(GetResponse(entity))
     }
 
     @Test
@@ -50,7 +51,7 @@ internal class PagedResultTest {
         pagedResult.iterator().next()
 
         // then
-        pagedResult.hits shouldEqual searchResponseWithScroll.hits.hits
+        pagedResult.hits shouldBe searchResponseWithScroll.hits.hits
     }
 
     @Test
@@ -76,7 +77,7 @@ internal class PagedResultTest {
         val mappedPages = pagedResult.map { it }
 
         // then
-        mappedPages shouldEqual listOf(pages[0].hits.hits, pages[1].hits.hits, pages[2].hits.hits)
+        mappedPages shouldContainAll listOf(pages[0].hits.hits, pages[1].hits.hits, pages[2].hits.hits)
     }
 
     @Test
@@ -103,9 +104,9 @@ internal class PagedResultTest {
         currentPage = 0
 
         // then
-        mappedPages shouldEqual pagedResult.map { it }
-        mappedPages.flatten() shouldEqual pagedResult.hits
-        mappedPages.flatten().size shouldEqual 10
+        mappedPages shouldBe pagedResult.map { it }
+        mappedPages.flatten() shouldBe pagedResult.hits
+        mappedPages.flatten().size shouldBe 10
     }
 
     data class Entity(val value: String)

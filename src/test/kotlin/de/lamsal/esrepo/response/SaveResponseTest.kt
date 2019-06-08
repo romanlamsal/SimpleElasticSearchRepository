@@ -2,7 +2,7 @@ package de.lamsal.esrepo.response
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import de.lamsal.esrepo.util.DefaultObjectMapper
-import org.amshove.kluent.shouldEqual
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.Test
 
 internal class SaveResponseTest {
@@ -16,7 +16,7 @@ internal class SaveResponseTest {
 
     @Test
     fun `should deserialize SaveResponse from JSON`() {
-        mapper.readValue<SaveResponse>(jsonString) shouldEqual saveResponse
+        mapper.readValue<SaveResponse>(jsonString) shouldBe saveResponse
     }
 
 

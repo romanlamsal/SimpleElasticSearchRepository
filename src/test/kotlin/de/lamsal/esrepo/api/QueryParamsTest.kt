@@ -1,6 +1,6 @@
 package de.lamsal.esrepo.api
 
-import org.amshove.kluent.shouldEqual
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.Test
 
 internal class QueryParamsTest {
@@ -11,7 +11,7 @@ internal class QueryParamsTest {
         val params = QueryParams(size = 1337, scroll = "42m")
 
         // when, then
-        params.toString() shouldEqual "?scroll=42m&size=1337"
+        params.toString() shouldBe "?scroll=42m&size=1337"
     }
 
     @Test
@@ -20,7 +20,7 @@ internal class QueryParamsTest {
         val params = QueryParams(size = 1337, scroll = null)
 
         // when, then
-        params.toString() shouldEqual "?size=1337"
+        params.toString() shouldBe "?size=1337"
     }
 
     @Test
@@ -29,6 +29,6 @@ internal class QueryParamsTest {
         val params = QueryParams()
 
         // when, then
-        params.toString() shouldEqual ""
+        params.toString() shouldBe ""
     }
 }

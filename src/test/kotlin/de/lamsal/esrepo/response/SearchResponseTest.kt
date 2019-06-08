@@ -2,7 +2,8 @@ package de.lamsal.esrepo.response
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import de.lamsal.esrepo.util.DefaultObjectMapper
-import org.amshove.kluent.shouldEqual
+import io.kotlintest.matchers.collections.shouldContainAll
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
@@ -75,8 +76,8 @@ internal class SearchResponseTest {
         // then
         assertNull(deserialized._scroll_id)
         deserialized.hits.apply {
-            total shouldEqual 5
-            hits shouldEqual listOf(GetResponse(Entity(type = "ort", value = "Archshofen")))
+            total shouldBe 5
+            hits shouldContainAll listOf(GetResponse(Entity(type = "ort", value = "Archshofen")))
         }
     }
 
@@ -89,10 +90,10 @@ internal class SearchResponseTest {
         val deserialized = mapper.readValue<SearchResponse<Entity>>(jsonWithScrollId)
 
         // then
-        deserialized._scroll_id!! shouldEqual "somescrollid"
+        deserialized._scroll_id!! shouldBe "somescrollid"
         deserialized.hits.apply {
-            total shouldEqual 3
-            hits shouldEqual listOf(GetResponse(Entity(type = "ort", value = "Beuren")))
+            total shouldBe 3
+            hits shouldContainAll listOf(GetResponse(Entity(type = "ort", value = "Beuren")))
         }
     }
 

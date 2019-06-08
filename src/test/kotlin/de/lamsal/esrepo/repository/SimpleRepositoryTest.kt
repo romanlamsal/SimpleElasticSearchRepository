@@ -1,6 +1,5 @@
 package de.lamsal.esrepo.repository
 
-import de.lamsal.esrepo.api.HttpRequester
 import de.lamsal.esrepo.ElasticSearchConfiguration
 import de.lamsal.esrepo.api.IHttpRequester
 import de.lamsal.esrepo.api.PagedResult
@@ -10,9 +9,12 @@ import de.lamsal.esrepo.dsl.terms
 import de.lamsal.esrepo.exception.HttpError
 import de.lamsal.esrepo.response.GetResponse
 import de.lamsal.esrepo.util.DefaultObjectMapper
-import io.mockk.*
+import io.kotlintest.shouldBe
+import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.OverrideMockKs
-import org.amshove.kluent.shouldEqual
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
@@ -139,7 +141,7 @@ internal class SimpleRepositoryTest {
         val saveresponse = repository.save(entity)
 
         // then
-        saveresponse shouldEqual expectedId
+        saveresponse shouldBe expectedId
         verify { apiMock.post(any(), mapper.writeValueAsString(entity)) }
     }
 
@@ -157,7 +159,7 @@ internal class SimpleRepositoryTest {
 
         // then
         verify { apiMock.put(any(), mapper.writeValueAsString(entity)) }
-        saveresponse shouldEqual expectedId
+        saveresponse shouldBe expectedId
     }
 
     @Test
