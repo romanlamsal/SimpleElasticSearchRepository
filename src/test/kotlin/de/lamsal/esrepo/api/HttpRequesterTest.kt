@@ -1,5 +1,6 @@
 package de.lamsal.esrepo.api
 
+import com.github.kittinunf.fuel.core.FuelError
 import de.lamsal.esrepo.exception.HttpError
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
@@ -102,7 +103,7 @@ internal class HttpRequesterTestIT {
         )
 
         // when, then
-        assertThrows(HttpError::class.java) {
+        assertThrows(FuelError::class.java) {
             HttpRequester().get("http://$host:$port")
         }
     }

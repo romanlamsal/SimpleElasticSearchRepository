@@ -30,7 +30,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9'
-    implementation 'khttp:khttp:1.0.0'
+    implementation 'com.github.kittinunf.fuel:fuel:2.1.0'
 
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
     testImplementation "io.mockk:mockk:1.9.3"
