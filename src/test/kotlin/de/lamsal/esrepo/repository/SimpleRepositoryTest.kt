@@ -76,7 +76,7 @@ internal class SimpleRepositoryTest {
               {
                 "_index": "choices",
                 "_type": "choice",
-                "_id": "kjasld",
+                "_id": "some_id",
                 "_score": 2.730029,
                 "_source": {
                   "value": "Foo"
@@ -85,7 +85,7 @@ internal class SimpleRepositoryTest {
               {
                 "_index": "choices",
                 "_type": "choice",
-                "_id": "24n11l",
+                "_id": "other_id",
                 "_score": 2.4849067,
                 "_source": {
                   "value": "Bar"
@@ -197,7 +197,7 @@ internal class SimpleRepositoryTest {
         val pagedResult: PagedResult<Entity> = repository.executeQuery(query, QueryParams(size = 2, scroll = "5m"))
 
         // then
-        val expectedHits = listOf(GetResponse(Entity("Foo")), GetResponse(Entity("Bar")))
+        val expectedHits = listOf(GetResponse(Entity("Foo"), "some_id"), GetResponse(Entity("Bar"), "other_id"))
         assertEquals(expectedHits, pagedResult.flatten())
     }
 

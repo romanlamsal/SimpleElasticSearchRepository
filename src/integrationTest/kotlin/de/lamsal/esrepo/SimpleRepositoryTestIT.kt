@@ -64,7 +64,7 @@ class SimpleRepositoryTestIT : BaseIntegrationTest() {
     fun `should be searchable with query and successfully paginate`() {
         // given
         // updated entity and savableEntity
-        repository.save(savableEntity)
+        val receivedIdOfSecond = repository.save(savableEntity)
         val query = query {
             bool {
                 should {
@@ -85,8 +85,8 @@ class SimpleRepositoryTestIT : BaseIntegrationTest() {
 
         // then
         searchResponse.flatten() shouldContainAll listOf(
-            GetResponse(savableEntityChanged),
-            GetResponse(savableEntity)
+            GetResponse(savableEntityChanged, receivedId),
+            GetResponse(savableEntity, receivedIdOfSecond)
         )
     }
 

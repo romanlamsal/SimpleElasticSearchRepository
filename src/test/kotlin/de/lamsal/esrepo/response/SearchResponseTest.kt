@@ -52,7 +52,7 @@ internal class SearchResponseTest {
                 {
                   "_index": "choices",
                   "_type": "choice",
-                  "_id": "213b1239",
+                  "_id": "ort_Beuren",
                   "_score": 2.3671236,
                   "_source": {
                     "type": "ort",
@@ -77,7 +77,7 @@ internal class SearchResponseTest {
         assertNull(deserialized._scroll_id)
         deserialized.hits.apply {
             total shouldBe 5
-            hits shouldContainAll listOf(GetResponse(Entity(type = "ort", value = "Archshofen")))
+            hits shouldContainAll listOf(GetResponse(Entity(type = "ort", value = "Archshofen"), "ort_Archshofen"))
         }
     }
 
@@ -93,7 +93,7 @@ internal class SearchResponseTest {
         deserialized._scroll_id!! shouldBe "somescrollid"
         deserialized.hits.apply {
             total shouldBe 3
-            hits shouldContainAll listOf(GetResponse(Entity(type = "ort", value = "Beuren")))
+            hits shouldContainAll listOf(GetResponse(Entity(type = "ort", value = "Beuren"), "ort_Beuren"))
         }
     }
 
