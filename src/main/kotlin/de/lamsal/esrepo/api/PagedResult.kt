@@ -9,7 +9,7 @@ class PagedResult<T>(
 ) : Iterable<List<GetResponse<T>>> {
     val hits: MutableList<GetResponse<T>> = searchResponse.hits.hits.toMutableList()
 
-    private val scrollId = searchResponse._scroll_id
+    private var scrollId = searchResponse._scroll_id
     private val pages: MutableList<SearchResponse<T>> = mutableListOf(searchResponse)
 
     override fun iterator(): Iterator<List<GetResponse<T>>> = PageIterator(0)
@@ -20,8 +20,9 @@ class PagedResult<T>(
         override fun next(): List<GetResponse<T>> {
             return pages[nextPage++].hits.hits.also {
                 if (scrollId != null && nextPage == pages.size) {
-                    onNextPage(scrollId).apply {
+                    onNextPage(scrollId!!).apply {
                         pages.add(this)
+                        scrollId = _scroll_id
                         this@PagedResult.hits.addAll(hits.hits)
                     }
                 }
