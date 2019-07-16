@@ -2,13 +2,14 @@ package de.lamsal.esrepo.repository
 
 import de.lamsal.esrepo.ElasticSearchConfiguration
 import de.lamsal.esrepo.api.IHttpRequester
-import de.lamsal.esrepo.api.PagedResult
 import de.lamsal.esrepo.api.QueryParams
 import de.lamsal.esrepo.dsl.query
 import de.lamsal.esrepo.dsl.terms
 import de.lamsal.esrepo.exception.HttpError
 import de.lamsal.esrepo.response.GetResponse
+import de.lamsal.esrepo.response.SearchResponse
 import de.lamsal.esrepo.util.DefaultObjectMapper
+import io.kotlintest.matchers.collections.shouldContainAll
 import io.kotlintest.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -187,18 +188,19 @@ internal class SimpleRepositoryTest {
     }
 
     @Test
-    fun `should be able to execute query with params`() {
+    fun `should be able to execute query and fetch all results at once`() {
         // given
         val query = query { terms { "value" to listOf("Foo", "Bar") } }.toString()
-        every { apiMock.post("$hostUrl/$index/$doctype/_search?scroll=5m&size=2", query) } returns searchResponseJson
-        every { apiMock.get("$hostUrl/_search/scroll?scroll_id=$scrollId") } returns searchResponseJsonPageTwo
+        val size = 2
+        every { apiMock.get("$hostUrl/$index/$doctype/_count") } returns """{"count": $size,"_shards": {"total": 5,"successful": 5,"skipped": 0,"failed": 0}}"""
+        every { apiMock.post("$hostUrl/$index/$doctype/_search?size=$size", query) } returns searchResponseJson
 
         // when
-        val pagedResult: PagedResult<Entity> = repository.executeQuery(query, QueryParams(size = 2, scroll = "5m"))
+        val queryResult: SearchResponse<Entity> = repository.executeQuery(query)
 
         // then
         val expectedHits = listOf(GetResponse(Entity("Foo"), "some_id"), GetResponse(Entity("Bar"), "other_id"))
-        assertEquals(expectedHits, pagedResult.flatten())
+        queryResult.hits.hits shouldContainAll expectedHits
     }
 
     @Test

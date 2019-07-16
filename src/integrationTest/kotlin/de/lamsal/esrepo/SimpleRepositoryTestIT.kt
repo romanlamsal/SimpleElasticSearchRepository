@@ -81,10 +81,10 @@ class SimpleRepositoryTestIT : BaseIntegrationTest() {
         repository.refresh()
 
         // when: query for the two entities present with size=1, which should result in actual paging of the results
-        val searchResponse = repository.executeQuery(query.toString(), QueryParams(size = 1, scroll = "1m"))
+        val searchResponse = repository.executeQuery(query.toString())
 
         // then
-        searchResponse.flatten() shouldContainAll listOf(
+        searchResponse.hits.hits shouldContainAll listOf(
             GetResponse(savableEntityChanged, receivedId),
             GetResponse(savableEntity, receivedIdOfSecond)
         )

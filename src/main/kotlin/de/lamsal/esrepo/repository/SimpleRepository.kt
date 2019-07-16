@@ -6,9 +6,7 @@ import de.lamsal.esrepo.api.HttpRequester
 import de.lamsal.esrepo.api.IHttpRequester
 import de.lamsal.esrepo.util.DefaultObjectMapper
 import de.lamsal.esrepo.ElasticSearchConfiguration
-import de.lamsal.esrepo.api.PagedResult
 import de.lamsal.esrepo.api.QueryParams
-import de.lamsal.esrepo.exception.HttpError
 import de.lamsal.esrepo.response.GetResponse
 import de.lamsal.esrepo.response.SaveResponse
 import de.lamsal.esrepo.response.SearchResponse
@@ -47,13 +45,10 @@ class SimpleRepository<T>(
     }
 
     private val classToSearchResponse = mapper.typeFactory.constructParametricType(SearchResponse::class.java, clazz)
-    fun executeQuery(query: String, queryParams: QueryParams): PagedResult<T> = PagedResult(
-        mapper.readValue<SearchResponse<T>>(
-            api.post("$hostUrl/$index/$doctype/_search$queryParams", query), classToSearchResponse
-        )
-    ) { scrollId ->
-        mapper.readValue<SearchResponse<T>>(
-            api.get("$hostUrl/_search/scroll?scroll_id=$scrollId"), classToSearchResponse
+    fun executeQuery(query: String): SearchResponse<T> {
+        val size: Int = mapper.readValue<Map<String, Any>>(api.get("$hostUrl/$index/$doctype/_count"))["count"] as Int
+        return mapper.readValue<SearchResponse<T>>(
+            api.post("$hostUrl/$index/$doctype/_search${QueryParams(size = size)}", query), classToSearchResponse
         )
     }
 }
