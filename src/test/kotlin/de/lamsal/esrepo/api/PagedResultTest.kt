@@ -59,54 +59,25 @@ internal class PagedResultTest {
         // given
         // total of 10 hits
         // first page: one entry, second page: 8 entries, third page: one entry.
-        val pages = listOf(
-            searchResponseWithScroll,
+        val pages = mutableListOf(
+            SearchResponse(null, SearchResponse.SearchResponseHits(10, (0 until 10).map {
+                GetResponse(entity)
+            })),
             SearchResponse(null, SearchResponse.SearchResponseHits(10, (0 until 8).map {
                 GetResponse(entity)
             })),
-            searchResponseWithoutScroll,
             SearchResponse(null, SearchResponse.SearchResponseHits(10, emptyList()))
         )
-        var currentPage = 0
 
         val pagedResult = PagedResult(searchResponseWithScroll) {
-            pages[++currentPage]
+            pages.removeAt(0)
         }
 
         // when
-        val mappedPages = pagedResult.map { it }
+        val fetchedHits = pagedResult.hits
 
         // then
-        mappedPages shouldContainAll listOf(pages[0].hits.hits, pages[1].hits.hits, pages[2].hits.hits)
-    }
-
-    @Test
-    fun `should iterate TWICE over all pages, will both times return the same result`() {
-        // given
-        // total of 10 hits
-        // first page: one entry, second page: 8 entries, third page: one entry.
-        val pages = listOf(
-            searchResponseWithScroll,
-            SearchResponse(null, SearchResponse.SearchResponseHits(10, (1..8).map {
-                GetResponse(Entity("$it"))
-            })),
-            searchResponseWithoutScroll,
-            SearchResponse(null, SearchResponse.SearchResponseHits(10, emptyList()))
-        )
-        var currentPage = 0
-
-        val pagedResult = PagedResult(searchResponseWithScroll) {
-            pages[++currentPage]
-        }
-
-        // when
-        val mappedPages = pagedResult.map { it }
-        currentPage = 0
-
-        // then
-        mappedPages shouldBe pagedResult.map { it }
-        mappedPages.flatten() shouldBe pagedResult.hits
-        mappedPages.flatten().size shouldBe 10
+        fetchedHits shouldContainAll listOf(pages[0].hits.hits, pages[1].hits.hits, pages[2].hits.hits).flatten()
     }
 
     data class Entity(val value: String)

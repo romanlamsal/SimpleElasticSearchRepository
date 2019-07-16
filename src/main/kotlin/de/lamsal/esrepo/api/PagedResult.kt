@@ -22,7 +22,7 @@ class PagedResult<T>(
                 if (scrollId != null && nextPage == pages.size) {
                     onNextPage(scrollId!!).apply {
                         pages.add(this)
-                        scrollId = _scroll_id
+                        this@PagedResult.scrollId = _scroll_id
                         this@PagedResult.hits.addAll(hits.hits)
                     }
                 }
